@@ -3,17 +3,15 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.get("/", (req, res) => {
-    res.redirect("/login-page");
-});
-
 app.use((req, res, next) => {
     if (req.url === "/favicon.ico") {
         res.sendFile(__dirname + "/favicon.ico");
     } else {
         next();
     }
+});
+app.get("/", (req, res) => {
+    res.redirect("/login-page");
 });
 
 let users = [];
