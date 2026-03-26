@@ -3758,7 +3758,25 @@ window.location.href="/dashboard";
 </html>`);
 });
 app.get("/admin", (req, res) => {
-    res.sendFile(__dirname + "/admin-login.html");
+    res.sendFile(__dirname + "/admin.html");
+});
+
+let stores = [];
+
+app.post("/submit-store", (req, res) => {
+    let storeData = req.body;
+
+    storeData.status = "Pending";
+
+    stores.push(storeData);
+
+    console.log("NEW STORE:", storeData);
+
+    res.json({ success: true });
+});
+
+app.get("/get-stores", (req, res) => {
+    res.json(stores);
 });
 
 const PORT = process.env.PORT || 3000;
