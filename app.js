@@ -3758,7 +3758,7 @@ window.location.href="/dashboard";
 </html>`);
 });
 app.get("/admin", (req, res) => {
-    res.sendFile(__dirname + "/admin.html");
+    res.sendFile(__dirname + "/admin-login.html");
 });
 
 const PORT = process.env.PORT || 3000;
