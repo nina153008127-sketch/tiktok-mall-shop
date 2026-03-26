@@ -262,24 +262,50 @@ ${rows}
 
 // STORES
 if(page === "stores"){
-document.getElementById("content").innerHTML = `
-<div class="card">
-<h2>Stores</h2>
-<table>
-<tr><th>Name</th><th>Status</th><th>Action</th></tr>
-<tr>
-<td>Store 1</td>
-<td>Pending</td>
-<td>
-<button class="approve">Approve</button>
-<button class="reject">Reject</button>
-</td>
-</tr>
-</table>
-</div>
-`;
-}
+    document.getElementById("content").innerHTML = `
+    <div class="card">
+        <h2>Stores</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="storesTable"></tbody>
+        </table>
+    </div>
+    `;
 
+    // 🔥 تحميل البيانات من السيرفر
+    fetch("/get-stores")
+    .then(res => res.json())
+    .then(data => {
+
+        let table = document.getElementById("storesTable");
+        table.innerHTML = "";
+
+        if(data.length === 0){
+            table.innerHTML = "<tr><td colspan='3'>No stores</td></tr>";
+            return;
+        }
+
+        data.forEach((store, index) => {
+            table.innerHTML += `
+                <tr>
+                    <td>${store.name || "No name"}</td>
+                    <td>${store.status}</td>
+                    <td>
+                        <button onclick="approve(${index})">Approve</button>
+                        <button onclick="reject(${index})">Reject</button>
+                    </td>
+                </tr>
+            `;
+        });
+
+    });
+}
 if(page === "invite"){
 document.getElementById("content").innerHTML = `
 <div class="card">
