@@ -1,8 +1,13 @@
 const express = require("express");
+const path = require("path");
+
 const app = express();
+
+app.use(express.static(__dirname));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use((req, res, next) => {
     if (req.url === "/favicon.ico") {
         res.sendFile(__dirname + "/favicon.ico");
@@ -57,6 +62,30 @@ app.post("/login", (req, res) => {
     }
 
     res.json(user);
+});
+// ================= EDIT USER =================
+app.post("/edit-user", (req, res) => {
+    const { oldEmail, newEmail, newPassword } = req.body;
+
+    let user = users.find(u => u.email === oldEmail);
+
+    if(user){
+
+        // لو تم إدخال ايميل جديد
+        if(newEmail){
+            user.email = newEmail;
+        }
+
+        // لو تم إدخال باسورد جديد
+        if(newPassword){
+            user.password = newPassword;
+        }
+
+        res.json({ success: true });
+
+    } else {
+        res.json({ success: false });
+    }
 });
 // ================= ADMIN LOGIN API =================
 app.post("/admin-login", (req, res) => {
@@ -202,6 +231,10 @@ app.get("/reject/:id", (req, res) => {
 // ================= GET ALL REQUESTS =================
 app.get("/all-requests", (req, res) => {
     res.json(requests);
+});
+// ================= GET ALL USERS =================
+app.get("/users", (req, res) => {
+    res.json(users);
 });
 // ================= REQUEST API =================
 app.post("/request", (req, res) => {
