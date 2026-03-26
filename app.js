@@ -1,4 +1,16 @@
-const express = require("express");
+app.get("/", (req, res) => {
+  res.send(`
+  <!DOCTYPE html>
+  <html lang="ar">
+  <head>
+    <meta charset="UTF-8">
+    <title>موقعي</title>
+  </head>
+  <body>
+
+    <h1>هذا موقعي</h1>
+
+    <const express = require("express");
 const app = express();
 
 app.use(express.json());
@@ -3696,19 +3708,8 @@ window.location.href="/dashboard";
 
 </body>
 </html>`);
-});
-
-app.get("/", (req, res) => {
-  res.send(`
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <title>My Site</title>
-  </head>
-  <body>
-
-    <!-- 👇 هنا ضع تصميمك كامل -->
-    <h1>هذا موقعي</h1>
+ -->
+    <!-- HTML + CSS + JS -->
 
   </body>
   </html>
