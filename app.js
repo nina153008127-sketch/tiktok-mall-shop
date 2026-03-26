@@ -3697,6 +3697,11 @@ window.location.href="/dashboard";
 </body>
 </html>`);
 });
+
+app.get("/", (req, res) => {
+  res.send("Hello, your site is working 🚀");
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
