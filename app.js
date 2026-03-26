@@ -3700,22 +3700,18 @@ window.location.href="/dashboard";
 
 app.get("/", (req, res) => {
   res.send(`
-    <html>
-    <head>
-      <title>TikTok Mall</title>
-    </head>
-    <body>
-      <h1>Welcome to TikTok Mall 🛍️</h1>
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>My Site</title>
+  </head>
+  <body>
 
-      <h2>Register</h2>
-      <form method="POST" action="/register">
-        <input name="email" placeholder="Email" /><br><br>
-        <input name="password" placeholder="Password" /><br><br>
-        <input name="code" placeholder="Code" /><br><br>
-        <button type="submit">Register</button>
-      </form>
-    </body>
-    </html>
+    <!-- 👇 هنا ضع تصميمك كامل -->
+    <h1>هذا موقعي</h1>
+
+  </body>
+  </html>
   `);
 });
 
