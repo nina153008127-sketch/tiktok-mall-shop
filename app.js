@@ -299,6 +299,10 @@ if (document.getElementById("captchaInput").value != captcha) {
   alert("Wrong code");
   return;
 }
+  if (!email.value.endsWith("@gmail.com")) {
+    alert("Only Gmail is allowed");
+    return;
+  }
 fetch("/register",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
