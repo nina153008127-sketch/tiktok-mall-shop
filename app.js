@@ -1,20 +1,12 @@
-app.get("/", (req, res) => {
-  res.send(`
-  <!DOCTYPE html>
-  <html lang="ar">
-  <head>
-    <meta charset="UTF-8">
-    <title>موقعي</title>
-  </head>
-  <body>
-
-    <h1>هذا موقعي</h1>
-
-    <const express = require("express");
+const express = require("express");
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.get("/", (req, res) => {
+    res.redirect("/login-page");
+});
 
 let users = [];
 let requests = []; // 👈 هذا هو الحل
@@ -3708,16 +3700,13 @@ window.location.href="/dashboard";
 
 </body>
 </html>`);
- -->
-    <!-- HTML + CSS + JS -->
-
-  </body>
-  </html>
-  `);
+});
+app.get("/admin", (req, res) => {
+    res.sendFile(__dirname + "/admin.html");
 });
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
+    console.log("🔥 Server running on port " + PORT);
 });
