@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+display:flex;
+}
+
+/* LOGIN OVERLAY */
+#loginPage{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#0f0f0f;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+/* LOGIN BOX */
+.login-box {
+    background: #111;
+    padding: 40px;
+    border-radius: 20px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0,0,0,0.6);
+}
+
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: none;
+    background: #222;
+    color: white;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(45deg,#00f2ea,#ff0050);
+    color: white;
+    cursor: pointer;
+}
+
+/* SIDEBAR */
+.sidebar{
+width:220px;
+background:#0f0f0f;
+color:white;
+height:100vh;
+padding:20px;
+}
+
+.logo{
+font-size:24px;
+font-weight:bold;
+background: linear-gradient(45deg,#00f2ea,#ff0050);
+-webkit-background-clip: text;
+color: transparent;
+margin-bottom:30px;
+}
+
+.menu div{
+padding:12px;
+margin:5px 0;
+background:#111;
+border-radius:10px;
+cursor:pointer;
+}
+
+.menu div:hover{
+background:#222;
+}
+
+/* MAIN */
+.main{
+flex:1;
+background:#f5f5f5;
+padding:20px;
+overflow:auto;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:15px;
+margin-bottom:20px;
+}
+
+/* TABLE */
+table{
+width:100%;
+border-collapse: collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #ddd;
+text-align:left;
+}
+
+button{
+padding:5px 10px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.approve{background:green;color:white;}
+.reject{background:red;color:white;}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+<div class="login-box">
+
+    <div class="logo">TikTok Mall</div>
+
+    <h2 style="color:white;">Admin Login</h2>
+
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <div id="error" style="color:red;"></div>
+
+</div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div class="logo">TikTok Mall</div>
+
+<div class="menu">
+<div onclick="showPage('users')">👥 Users</div>
+<div onclick="showPage('stores')">🏪 Stores</div>
+<div onclick="showPage('wallet')">💰 Wallet</div>
+<div onclick="showPage('orders')">📦 Orders</div>
+<div onclick="showPage('support')">🎧 Support</div>
+<div onclick="showPage('invite')">🎟️ Invite Code</div>
+<div onclick="logout()">🚪 Logout</div>
+</div>
+
+</div>
+
+<!-- MAIN -->
+<div class="main" id="content">
+
+<h2>Welcome Admin 👑</h2>
+
+</div>
+
+<script>
+
+// LOGIN
+function login(){
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    if(username === "oscar" && password === "4090"){
+        localStorage.setItem("admin", "true");
+        document.getElementById("loginPage").style.display = "none";
+    } else {
+        document.getElementById("error").innerText = "Wrong username or password";
+    }
+}
+
+// AUTO LOGIN
+if(localStorage.getItem("admin") === "true"){
+    document.getElementById("loginPage").style.display = "none";
+}
+
+function editUser(email){
+
+    let newEmail = prompt("Enter new email:", email);
+    let newPass = prompt("Enter new password:");
+
+    if(!newEmail && !newPass) return;
+
+    fetch("/edit-user", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            oldEmail: email,
+            newEmail: newEmail,
+            newPassword: newPass
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            alert("Updated successfully ✅");
+            showPage("users");
+        } else {
+            alert("Error ❌");
+        }
+    });
+
+}
+
+// LOGOUT
+function logout(){
+    localStorage.removeItem("admin");
+    location.reload();
+}
+
+function showPage(page){
+
+// USERS
+fetch("/users")
+.then(res => res.json())
+.then(data => {
+
+let rows = "";
+
+if(data.length === 0){
+rows = "<tr><td colspan='3'>No users</td></tr>";
+}
+
+data.forEach(user => {
+rows += `
+<tr>
+<td>${user.email}</td>
+<td>${user.password}</td>
+<td><button onclick="editUser('${user.email}')">Edit</button></td>
+</tr>
+`;
+});
+
+document.getElementById("content").innerHTML = `
+<div class="card">
+<h2>Users</h2>
+<table>
+<tr><th>Email</th><th>Password</th><th>Action</th></tr>
+${rows}
+</table>
+</div>
+`;
+
+});
+
+// STORES
+if(page === "stores"){
+document.getElementById("content").innerHTML = `
+<div class="card">
+<h2>Stores</h2>
+<table>
+<tr><th>Name</th><th>Status</th><th>Action</th></tr>
+<tr>
+<td>Store 1</td>
+<td>Pending</td>
+<td>
+<button class="approve">Approve</button>
+<button class="reject">Reject</button>
+</td>
+</tr>
+</table>
+</div>
+`;
+}
+
+if(page === "invite"){
+document.getElementById("content").innerHTML = `
+<div class="card">
+<h2>Invite Code</h2>
+
+<p>Current Code:</p>
+<input id="inviteCode" value="${localStorage.getItem('inviteCode') || 'ABC123'}"
+
+<button onclick="saveCode()" style="margin-top:10px;">Save</button>
+
+</div>
+`;
+}
+
+// WALLET
+if(page === "wallet"){
+document.getElementById("content").innerHTML = `
+<div class="card">
+<h2>Wallet</h2>
+
+<p>USDT Address:</p>
+<input value="TBC76ppdDG8..." style="width:100%;padding:10px">
+
+<h3>Recharge Requests</h3>
+<table>
+<tr><th>Email</th><th>Amount</th><th>Action</th></tr>
+<tr>
+<td>user@gmail.com</td>
+<td>50$</td>
+<td>
+<button class="approve">Approve</button>
+<button class="reject">Reject</button>
+</td>
+</tr>
+</table>
+
+<h3>Withdraw Requests</h3>
+<table>
+<tr><th>Email</th><th>Amount</th><th>Action</th></tr>
+<tr>
+<td>user@gmail.com</td>
+<td>20$</td>
+<td>
+<button class="approve">Approve</button>
+<button class="reject">Reject</button>
+</td>
+</tr>
+</table>
+
+</div>
+`;
+}
+
+// ORDERS
+if(page === "orders"){
+document.getElementById("content").innerHTML = `
+<div class="card">
+<h2>Orders</h2>
+<table>
+<tr><th>Order ID</th><th>Status</th><th>Action</th></tr>
+<tr>
+<td>12345</td>
+<td>Shipped</td>
+<td><button>Mark Delivered</button></td>
+</tr>
+</table>
+</div>
+`;
+}
+
+// SUPPORT
+if(page === "support"){
+document.getElementById("content").innerHTML = `
+<div class="card">
+<h2>Support Messages</h2>
+
+<div style="background:#eee;padding:10px;margin:10px 0;">
+<p>User: Hello I need help</p>
+<input placeholder="Reply..." style="width:100%;padding:8px">
+<button>Send</button>
+</div>
+
+</div>
+`;
+}
+
+}
+
+
+function saveCode(){
+    let code = document.getElementById("inviteCode").value;
+
+    localStorage.setItem("inviteCode", code);
+
+    alert("Code updated!");
+}
+
+</script>
+
+</body>
+</html>
