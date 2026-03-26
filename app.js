@@ -285,12 +285,20 @@ text-decoration:none;
 <input id="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
 <input id="code" placeholder="Invite Code">
+<div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+  <input id="captchaInput" placeholder="Enter code">
+  <span id="captchaCode" style="color:white;"></span>
+</div>
 <button onclick="register()">Register</button>
 <br><br>
 <a href="/login-page">Go to Login</a>
 </div>
 <script>
 function register(){
+if (document.getElementById("captchaInput").value != captcha) {
+  alert("Wrong code");
+  return;
+}
 fetch("/register",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
@@ -306,6 +314,10 @@ alert(data);
 window.location.href="/login-page";
 })
 }
+
+let captcha = Math.floor(1000 + Math.random() * 9000);
+document.getElementById("captchaCode").innerText = captcha;
+
 </script>
 </body>
 </html>`);
