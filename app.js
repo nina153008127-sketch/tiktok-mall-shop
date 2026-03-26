@@ -657,7 +657,8 @@ Hi, <span id="username"></span>
 
 <script>
 let user = JSON.parse(localStorage.getItem("user"));
-document.getElementById("userInfo").innerText = user.email + " | ID: 633551";
+const userId = Math.floor(100000 + Math.random() * 900000);
+document.getElementById("userInfo").innerText = user.email + " | ID: " + userId;
 
 function toggleAccount(){
 let menu = document.getElementById("accountMenu");
