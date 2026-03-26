@@ -3699,7 +3699,24 @@ window.location.href="/dashboard";
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello, your site is working 🚀");
+  res.send(`
+    <html>
+    <head>
+      <title>TikTok Mall</title>
+    </head>
+    <body>
+      <h1>Welcome to TikTok Mall 🛍️</h1>
+
+      <h2>Register</h2>
+      <form method="POST" action="/register">
+        <input name="email" placeholder="Email" /><br><br>
+        <input name="password" placeholder="Password" /><br><br>
+        <input name="code" placeholder="Code" /><br><br>
+        <button type="submit">Register</button>
+      </form>
+    </body>
+    </html>
+  `);
 });
 
 const PORT = process.env.PORT || 3000;
