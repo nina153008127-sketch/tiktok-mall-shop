@@ -8,6 +8,14 @@ app.get("/", (req, res) => {
     res.redirect("/login-page");
 });
 
+app.use((req, res, next) => {
+    if (req.url === "/favicon.ico") {
+        res.sendFile(__dirname + "/favicon.ico");
+    } else {
+        next();
+    }
+});
+
 let users = [];
 let requests = []; // 👈 هذا هو الحل
 
