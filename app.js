@@ -430,7 +430,7 @@ body{margin:0;font-family:Arial;background:#f5f5f5;}
 <div class="icons">
 <span onclick="toggleSearch()">🔍</span>
 <span onclick="toggleMessages()">✉️</span>
-<span onclick="toggleAccount()">👤</span>
+<span onclick="toggleAccount()">🧑</span>
 <span onclick="toggleLang()">🌐</span>
 </div>
 </div>
@@ -438,7 +438,7 @@ body{margin:0;font-family:Arial;background:#f5f5f5;}
 <!-- ACCOUNT MENU -->
 <div id="accountMenu" style="display:none;position:fixed;top:50px;left:0;width:100%;height:100%;background:#f5f5f5;z-index:999;overflow:auto;">
 <div style="background:#ddd;padding:20px;text-align:center;">
-<div style="font-size:60px;">👤</div>
+<div style="font-size:60px;">🧑</div>
 <p>Hi</p>
 <p id="userInfo"></p>
 </div>
@@ -559,7 +559,7 @@ Hi, <span id="username"></span>
 </p>
 <p onclick="toggleAccount()" 
    style="cursor:pointer; padding:12px; border-bottom:1px solid #ccc;">
-👤 My account
+🧑 My account
 </p>
 <p onclick="openOrders()" style="cursor:pointer; color:#1976d2; font-weight:bold;">
 📋 My Order
