@@ -76,6 +76,81 @@ app.post("/mark-seen", (req, res) => {
 
     res.json({ success: true });
 });
+
+app.get("/support-page", (req, res) => {
+    res.send(`
+    <html>
+    <head>
+        <title>TikTok Mall Support</title>
+
+        <style>
+            body {
+                margin: 0;
+                font-family: Arial;
+                background: #f5f5f5;
+                text-align: center;
+            }
+
+            .header {
+                background: linear-gradient(90deg,#00f2ea,#ff0050);
+                color: white;
+                padding: 20px;
+                font-size: 22px;
+                font-weight: bold;
+            }
+
+            .box {
+                margin-top: 80px;
+                background: white;
+                width: 300px;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            }
+
+            .btn {
+                margin-top: 20px;
+                padding: 12px;
+                border-radius: 10px;
+                background: linear-gradient(90deg,#00f2ea,#ff0050);
+                color: white;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            .btn:hover {
+                opacity: 0.8;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="header">
+            📱 TikTok Mall Support
+        </div>
+
+        <div class="box">
+            <h2>Go to Customer Service</h2>
+
+            <p>💬 Live Chat</p>
+
+            <div class="btn" onclick="goChat()">Start Chat</div>
+        </div>
+
+        <script>
+        function goChat(){
+            window.location.href = "/live-chat";
+        }
+        </script>
+
+    </body>
+    </html>
+    `);
+});
+
 // ================= REGISTER API =================
 app.post("/register", (req, res) => {
     const { email, password, code } = req.body;
@@ -2257,34 +2332,55 @@ Customer Service
 <div class="section">
 <div class="title">Support Tools</div>
 
-<div class="item">🤖 ChatBot - Automate customer service with AI</div>
-<div class="item">📩 HelpDesk - Support customers with tickets</div>
-<div class="item">📚 KnowledgeBase - Guide and educate users</div>
-<div class="item">🧩 Widgets - Enhance your website</div>
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+🤖 ChatBot - Automate customer service with AI
+</div>
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+📩 HelpDesk - Support customers with tickets
+</div>
+
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+📚 KnowledgeBase - Guide and educate users
+</div>
+
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+🧩 Widgets - Enhance your website
 </div>
 
 <div class="section">
 <div class="title">Contact Options</div>
 
-<div class="item" onclick="window.location.href='/live-chat'">
-💬 Live Chat (24/7)
+<div onclick="window.location.href='/live-chat'" style="cursor:pointer;">
+💬 Live Chat
 </div>
-<div class="item">📧 Email Support</div>
-<div class="item">📞 Phone Support</div>
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+📧 Email Support
+</div>
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+📞 Phone Support
 </div>
 
 <div class="section">
 <div class="title">Get App</div>
 
-<div class="item">💻 Web Browser</div>
-<div class="item">📱 Android</div>
-<div class="item">🍎 iOS</div>
-<div class="item">🖥️ Windows</div>
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+💻 Web Browser
+</div>
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+📱 Android
+</div>
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+🍎 iOS
+</div>
+<div onclick="window.location.href='/support-page'" style="cursor:pointer;">
+🖥 Windows
 </div>
 
 <div class="section">
 <div class="title">Start your free live chat trial</div>
-<div class="btn">Sign up free</div>
+<div class="btn" onclick="window.location.href='/support-page'" style="cursor:pointer;">
+Sign up free
+</div>
 
 <div class="small">
 Customer service helps you engage with users, answer questions, and improve your platform experience.
@@ -2482,6 +2578,10 @@ color:#1976d2;
 <script>
 function goBack(){
 window.location.href="/dashboard";
+}
+
+function openSupportPage(){
+    window.location.href = "support.html";
 }
 
 function apply(){
