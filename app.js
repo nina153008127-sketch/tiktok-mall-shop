@@ -172,12 +172,39 @@ app.post("/register", (req, res) => {
     }
 
     // تسجيل المستخدم
-    users.push({ email, password, balance: 100 });
+    users.push({ 
+    email, 
+    password, 
+    balance:0,   // يبدأ بصفر
+    usdt: ""      // فاضي
+});
 
     console.log(users); // 👈 مهم جدًا
 
     res.send("User registered successfully");
 });
+app.get("/users", (req, res) => {
+    res.json(users);
+});
+
+app.post("/update-balance", (req, res) => {
+    const { email, balance } = req.body;
+
+    console.log("UPDATE REQUEST:", email, balance); // 👈 هنا أضف
+
+    let user = users.find(u => u.email === email);
+
+    if(!user){
+        return res.send("User not found");
+    }
+
+    user.balance = balance;
+
+    console.log("UPDATED USERS:", users); // 👈 وهنا
+
+    res.send("Balance updated");
+});
+
 // ================= LOGIN API =================
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
@@ -1291,7 +1318,21 @@ font-size:50px;
 <script>
 let user = JSON.parse(localStorage.getItem("user"));
 
-document.getElementById("balance").innerText = user.balance.toFixed(2);
+async function loadRealBalance(){
+
+    let email = user.email;
+
+    let res = await fetch("http://localhost:3000/users");
+    let users = await res.json();
+
+    let realUser = users.find(u => u.email === email);
+
+    if(realUser){
+        document.getElementById("balance").innerText = Number(realUser.balance).toFixed(2);
+    }
+}
+
+loadRealBalance();
 
 // BACK
 function goBack(){
@@ -1316,10 +1357,6 @@ let maxScroll = tabs.scrollWidth - tabs.clientWidth;
 let percent = tabs.scrollLeft / maxScroll;
 indicator.style.width = (percent * 100 + 20) + "%";
 });
-
-function goRecharge(){
-    window.location.href = "/recharge";
-}
 
 </script>
 
