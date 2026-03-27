@@ -228,6 +228,7 @@ function logout(){
 function showPage(page){
 
 // USERS
+if(page === 'users'){
 fetch("/users")
 .then(res => res.json())
 .then(data => {
@@ -259,6 +260,7 @@ ${rows}
 `;
 
 });
+}
 
 // STORES
 if(page === "stores"){
@@ -333,6 +335,46 @@ document.getElementById("content").innerHTML = `
 `;
 }
 
+if(page === 'support'){
+    document.getElementById("content").innerHTML = `
+        <h2>💬 Support Chats</h2>
+
+        <div id="chatList"></div>
+
+        <hr>
+
+        <div id="chatBox" style="display:none;">
+            <h3 id="chatUser"></h3>
+
+            <div id="messages" style="height:300px;overflow:auto;border:1px solid #ccc;padding:10px;"></div>
+
+            <input id="reply" placeholder="Type reply..." style="width:80%;">
+            <button onclick="sendReply()">Send</button>
+        </div>
+    `;
+}
+// تحميل المحادثات
+fetch("/all-chats")
+.then(res => res.json())
+.then(data => {
+
+    let list = document.getElementById("chatList");
+    list.innerHTML = "";
+
+    for(let email in data){
+        let div = document.createElement("div");
+        div.style.padding = "10px";
+        div.style.borderBottom = "1px solid #ccc";
+        div.style.cursor = "pointer";
+
+        div.innerText = email;
+
+        div.onclick = () => openChat(email);
+
+        list.appendChild(div);
+    }
+
+});
 // ORDERS
 if(page === "orders"){
 document.getElementById("content").innerHTML = `
@@ -351,7 +393,7 @@ document.getElementById("content").innerHTML = `
 }
 
 // SUPPORT
-if(page === "support"){
+if(page === "support_old"){
 document.getElementById("content").innerHTML = `
 <div class="card">
 <h2>Support Messages</h2>
@@ -375,6 +417,72 @@ function saveCode(){
     localStorage.setItem("inviteCode", code);
 
     alert("Code updated!");
+}
+
+let currentChat = "";
+
+// فتح محادثة
+function openChat(email){
+    currentChat = email;
+
+    document.getElementById("chatBox").style.display = "block";
+    document.getElementById("chatUser").innerText = email;
+
+    loadMessages();
+}
+
+// تحميل الرسائل
+function loadMessages(){
+    fetch("/get-messages/" + currentChat)
+    .then(res => res.json())
+    .then(data => {
+
+        let box = document.getElementById("messages");
+        box.innerHTML = "";
+
+        data.forEach(m => {
+            let div = document.createElement("div");
+            div.style.margin = "5px";
+
+            if(m.sender === "admin"){
+                div.style.textAlign = "right";
+                div.innerHTML = "<b>You:</b> " + m.text;
+            }else{
+                div.innerHTML = "<b>User:</b> " + m.text;
+            }
+
+            box.appendChild(div);
+        });
+
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+function sendReply(){
+    let text = document.getElementById("reply").value;
+
+    if(!text) return;
+
+    fetch("/send-message", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+               email: currentChat,
+               text: text,
+               sender: "admin"
+             })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            document.getElementById("reply").value = "";
+            loadMessages();
+        } else {
+            alert("Error sending ❌");
+        }
+    });
 }
 
 </script>
