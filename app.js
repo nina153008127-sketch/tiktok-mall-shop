@@ -21,7 +21,61 @@ app.get("/", (req, res) => {
 
 let users = [];
 let requests = []; // 👈 هذا هو الحل
+// ================= CHAT SYSTEM =================
+let messages = []; // كل الرسائل
 
+// إرسال رسالة
+app.post("/send-message", (req, res) => {
+    const { email, text, sender } = req.body;
+
+    if (!email || !text || !sender) {
+        return res.json({ success: false });
+    }
+
+    messages.push({
+        id: Date.now(),
+        email,
+        text,
+        sender, // "user" او "admin"
+        time: new Date().toLocaleString(),
+        seen: false
+    });
+
+    res.json({ success: true });
+});
+
+// جلب رسائل مستخدم معين
+app.get("/get-messages/:email", (req, res) => {
+    const userMessages = messages.filter(m => m.email === req.params.email);
+    res.json(userMessages);
+});
+
+// جلب كل المحادثات (للأدمن)
+app.get("/all-chats", (req, res) => {
+    let chats = {};
+
+    messages.forEach(m => {
+        if (!chats[m.email]) {
+            chats[m.email] = [];
+        }
+        chats[m.email].push(m);
+    });
+
+    res.json(chats);
+});
+
+// تعليم الرسائل كمقروءة
+app.post("/mark-seen", (req, res) => {
+    const { email } = req.body;
+
+    messages.forEach(m => {
+        if (m.email === email && m.sender === "admin") {
+            m.seen = true;
+        }
+    });
+
+    res.json({ success: true });
+});
 // ================= REGISTER API =================
 app.post("/register", (req, res) => {
     const { email, password, code } = req.body;
@@ -2212,7 +2266,9 @@ Customer Service
 <div class="section">
 <div class="title">Contact Options</div>
 
-<div class="item">💬 Live Chat (24/7)</div>
+<div class="item" onclick="window.location.href='/live-chat'">
+💬 Live Chat (24/7)
+</div>
 <div class="item">📧 Email Support</div>
 <div class="item">📞 Phone Support</div>
 </div>
@@ -3759,6 +3815,164 @@ window.location.href="/dashboard";
 });
 app.get("/admin", (req, res) => {
     res.sendFile(__dirname + "/admin.html");
+});
+// ================= LIVE CHAT PAGE =================
+app.get("/live-chat", (req, res) => {
+res.send(`<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#f5f5f5;
+display:flex;
+flex-direction:column;
+height:100vh;
+}
+
+.header{
+background:#1976d2;
+color:white;
+padding:15px;
+text-align:center;
+position:relative;
+}
+
+.back{
+position:absolute;
+left:15px;
+top:15px;
+cursor:pointer;
+}
+
+.chat{
+flex:1;
+overflow:auto;
+padding:10px;
+}
+
+.msg{
+margin:10px 0;
+max-width:70%;
+padding:10px;
+border-radius:10px;
+}
+
+.user{
+background:#1976d2;
+color:white;
+margin-left:auto;
+}
+
+.admin{
+background:#eee;
+color:black;
+margin-right:auto;
+}
+
+.inputBox{
+display:flex;
+padding:10px;
+background:white;
+}
+
+.inputBox input{
+flex:1;
+padding:10px;
+border:1px solid #ccc;
+border-radius:10px;
+}
+
+.inputBox button{
+padding:10px;
+margin-left:5px;
+border:none;
+background:#1976d2;
+color:white;
+border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<span class="back" onclick="goBack()">←</span>
+💬 TikTok Mall Support
+</div>
+
+<div class="chat" id="chat"></div>
+
+<div class="inputBox">
+<input id="msg" placeholder="Type message...">
+<button onclick="send()">Send</button>
+</div>
+
+<script>
+let user = JSON.parse(localStorage.getItem("user"));
+
+function goBack(){
+window.location.href = "/support";
+}
+
+// تحميل الرسائل
+function loadMessages(){
+fetch("/get-messages/" + user.email)
+.then(res=>res.json())
+.then(data=>{
+
+let chat = document.getElementById("chat");
+chat.innerHTML = "";
+
+data.forEach(m => {
+let div = document.createElement("div");
+div.className = "msg " + (m.sender === "user" ? "user" : "admin");
+
+if(m.sender === "admin"){
+div.innerHTML = "<b>🎧 TikTok Mall</b><br>" + m.text;
+}else{
+div.innerText = m.text;
+}
+
+chat.appendChild(div);
+});
+
+chat.scrollTop = chat.scrollHeight;
+});
+}
+
+// إرسال رسالة
+function send(){
+let text = document.getElementById("msg").value;
+
+if(!text) return;
+
+fetch("/send-message", {
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body: JSON.stringify({
+email: user.email,
+text: text,
+sender: "user"
+})
+})
+.then(()=>{
+document.getElementById("msg").value = "";
+loadMessages();
+});
+}
+
+// تحديث كل 2 ثانية
+setInterval(loadMessages, 2000);
+
+// تحميل أول مرة
+loadMessages();
+</script>
+
+</body>
+</html>`);
 });
 
 const PORT = process.env.PORT || 3000;
