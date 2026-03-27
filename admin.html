@@ -298,41 +298,51 @@ document.getElementById("content").innerHTML = `
 
 // WALLET
 if(page === "wallet"){
+
 document.getElementById("content").innerHTML = `
 <div class="card">
-<h2>Wallet</h2>
+
+<h2>💰 Wallet Management</h2>
+
+<!-- USERS LIST -->
+<h3>Users</h3>
+<div id="walletUsers"></div>
+
+<hr>
+
+<!-- USER CONTROL PANEL -->
+<div id="walletPanel" style="display:none;">
+
+<h3 id="walletUserEmail"></h3>
+
+<p>Balance:</p>
+<input id="balanceInput" type="number" style="width:100%;padding:10px">
+
+<button onclick="updateBalance()" style="margin-top:10px;">Update Balance</button>
+
+<hr>
 
 <p>USDT Address:</p>
-<input value="TBC76ppdDG8..." style="width:100%;padding:10px">
+<input id="usdtInput" style="width:100%;padding:10px">
 
-<h3>Recharge Requests</h3>
-<table>
-<tr><th>Email</th><th>Amount</th><th>Action</th></tr>
-<tr>
-<td>user@gmail.com</td>
-<td>50$</td>
-<td>
-<button class="approve">Approve</button>
-<button class="reject">Reject</button>
-</td>
-</tr>
-</table>
+<button onclick="updateUSDT()" style="margin-top:10px;">Update Address</button>
 
-<h3>Withdraw Requests</h3>
-<table>
-<tr><th>Email</th><th>Amount</th><th>Action</th></tr>
-<tr>
-<td>user@gmail.com</td>
-<td>20$</td>
-<td>
-<button class="approve">Approve</button>
-<button class="reject">Reject</button>
-</td>
-</tr>
-</table>
+<hr>
+
+<h3>📥 Deposits</h3>
+<div id="depositList"></div>
+
+<hr>
+
+<h3>📤 Withdraw Requests</h3>
+<div id="withdrawList"></div>
+
+</div>
 
 </div>
 `;
+
+loadWalletUsers();
 }
 
 if(page === 'support'){
@@ -483,6 +493,246 @@ function sendReply(){
             alert("Error sending ❌");
         }
     });
+}
+
+// بيانات وهمية (مؤقتة)
+let walletData = JSON.parse(localStorage.getItem("walletData")) || [
+    {
+        email: "user1@gmail.com",
+        balance: 100,
+        usdt: "TXXXX111",
+        deposits: [
+            {amount: 50, image: "https://via.placeholder.com/100", status: "pending"}
+        ],
+        withdraws: [
+            {amount: 20, status: "pending"}
+        ]
+    },
+    {
+        email: "user2@gmail.com",
+        balance: 200,
+        usdt: "TXXXX222",
+        deposits: [],
+        withdraws: []
+    }
+];
+
+function saveWalletData(){
+    localStorage.setItem("walletData", JSON.stringify(walletData));
+}
+
+// عرض المستخدمين
+async function loadWalletUsers(){
+
+    let res = await fetch("http://localhost:3000/users");
+    let data = await res.json();
+
+    walletData = data;
+
+    let container = document.getElementById("walletUsers");
+    container.innerHTML = "";
+
+    walletData.forEach(user => {
+        let div = document.createElement("div");
+        div.style.padding = "10px";
+        div.style.margin = "5px 0";
+        div.style.background = "#eee";
+        div.style.cursor = "pointer";
+
+        div.innerText = user.email;
+
+        div.onclick = () => openWallet(user.email);
+
+        container.appendChild(div);
+    });
+}
+
+// فتح لوحة المستخدم
+let currentWalletUser = null;
+
+async function openWallet(email){
+
+    let res = await fetch("http://localhost:3000/users");
+    let data = await res.json();
+
+    walletData = data;
+
+    let user = walletData.find(u => u.email === email);
+    currentWalletUser = user;
+
+    if(!user) return;
+
+    document.getElementById("walletPanel").style.display = "block";
+    document.getElementById("walletUserEmail").innerText = email;
+
+    document.getElementById("balanceInput").value = user.balance;
+    document.getElementById("usdtInput").value = user.usdt || "";
+
+    loadDeposits();
+    loadWithdraws();
+}
+
+// تحديث الرصيد
+async function updateBalance(){
+
+    let newBalance = document.getElementById("balanceInput").value;
+
+    console.log("Sending:", currentWalletUser.email, newBalance);
+
+    let res = await fetch("http://localhost:3000/update-balance", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: currentWalletUser.email,
+            balance: Number(newBalance)
+        })
+    });
+
+    let data = await res.text();
+    alert(data);
+
+      loadWalletUsers();
+      openWallet(currentWalletUser.email);
+ } 
+
+// تحديث عنوان USDT
+function updateUSDT(){
+    let newUSDT = document.getElementById("usdtInput").value;
+
+    if(!currentWalletUser) return;
+
+    currentWalletUser.usdt = newUSDT;
+       saveWalletData();
+
+    alert("USDT Address updated ✅");
+}
+
+// عرض الإيداعات
+function loadDeposits(){
+    let container = document.getElementById("depositList");
+    container.innerHTML = "";
+
+    if(currentWalletUser.deposits.length === 0){
+        container.innerHTML = "<p>No deposits</p>";
+        return;
+    }
+
+    currentWalletUser.deposits.forEach((dep, index) => {
+
+        let div = document.createElement("div");
+        div.style.border = "1px solid #ccc";
+        div.style.padding = "10px";
+        div.style.margin = "10px 0";
+
+div.innerHTML = `
+    <div style="display:flex;gap:15px;align-items:center;">
+
+        <img src="${dep.image}" 
+     onerror="this.src='https://dummyimage.com/200x120/000/fff.png&text=No+Image'" 
+     width="120" 
+     style="border-radius:10px;border:1px solid #ccc">
+        <div>
+            <p><b>Amount:</b> ${dep.amount}$</p>
+            <p><b>Status:</b> ${dep.status}</p>
+
+            <button class="approve" onclick="approveDeposit(${index})">Approve</button>
+            <button class="reject" onclick="rejectDeposit(${index})">Reject</button>
+        </div>
+
+    </div>
+`;
+
+        container.appendChild(div);
+    });
+}
+
+// موافقة
+function approveDeposit(index){
+    currentWalletUser.deposits[index].status = "approved";
+
+    // زيادة الرصيد تلقائياً
+    currentWalletUser.balance += currentWalletUser.deposits[index].amount;
+       saveWalletData();
+
+    document.getElementById("balanceInput").value = currentWalletUser.balance;
+
+    loadDeposits();
+
+    alert("Deposit approved ✅");
+}
+
+// رفض
+function rejectDeposit(index){
+    currentWalletUser.deposits[index].status = "rejected";
+      saveWalletData();
+
+    loadDeposits();
+
+    alert("Deposit rejected ❌");
+}
+
+// عرض طلبات السحب
+function loadWithdraws(){
+    let container = document.getElementById("withdrawList");
+    container.innerHTML = "";
+
+    if(currentWalletUser.withdraws.length === 0){
+        container.innerHTML = "<p>No withdraw requests</p>";
+        return;
+    }
+
+    currentWalletUser.withdraws.forEach((w, index) => {
+
+        let div = document.createElement("div");
+        div.style.border = "1px solid #ccc";
+        div.style.padding = "10px";
+        div.style.margin = "10px 0";
+
+        div.innerHTML = `
+            <p><b>Amount:</b> ${w.amount}$</p>
+            <p><b>Status:</b> ${w.status}</p>
+
+            <button class="approve" onclick="approveWithdraw(${index})">Approve</button>
+            <button class="reject" onclick="rejectWithdraw(${index})">Reject</button>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+// موافقة السحب
+function approveWithdraw(index){
+
+    let amount = currentWalletUser.withdraws[index].amount;
+
+    if(currentWalletUser.balance < amount){
+        alert("Not enough balance ❌");
+        return;
+    }
+
+    currentWalletUser.withdraws[index].status = "approved";
+
+    // خصم الرصيد
+    currentWalletUser.balance -= amount;
+       saveWalletData();
+
+    document.getElementById("balanceInput").value = currentWalletUser.balance;
+
+    loadWithdraws();
+
+    alert("Withdraw approved ✅");
+}
+
+// رفض السحب
+function rejectWithdraw(index){
+    currentWalletUser.withdraws[index].status = "rejected";
+      saveWalletData();
+
+    loadWithdraws();
+
+    alert("Withdraw rejected ❌");
 }
 
 </script>
