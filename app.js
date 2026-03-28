@@ -233,6 +233,23 @@ app.post("/update-balance", (req, res) => {
     res.send("Balance updated");
 });
 
+// ================= UPDATE USDT ADDRESS =================
+app.post("/update-usdt", (req, res) => {
+    const { email, usdt } = req.body;
+
+    let user = users.find(u => u.email === email);
+
+    if(!user){
+        return res.json({ success: false });
+    }
+
+    user.usdt = usdt;
+
+    saveUsers(); // مهم جداً
+
+    res.json({ success: true });
+});
+
 // ================= LOGIN API =================
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
@@ -1536,12 +1553,11 @@ font-size:16px;
 
 <!-- ADDRESS -->
 <p>USDT Address</p>
-<div class="address" id="address">TBC76ppdDG8aiX4ECAhEmn7TASPm2iAWS</div>
+<div class="address" id="address">Loading...</div>
 
 <!-- QR -->
 <div class="qr">
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TBC76ppdDG8aiX4ECAhEmn7TASPm2iAWS">
-</div>
+<img id="qr" src=""></div>
 
 <!-- AMOUNT -->
 <p>Recharge amount</p>
@@ -1609,37 +1625,78 @@ function uploadImage(){
 alert("Upload system will be added later");
 }
 
-// CONFIRM
+// ================= CONFIRM =================
 function confirmRecharge(){
-let amount = document.getElementById("amount").value;
-let user = JSON.parse(localStorage.getItem("user"));
+    let amount = document.getElementById("amount").value;
 
-if(!amount){
-alert("Enter amount");
-return;
+    if(!amount){
+        alert("Enter amount");
+        return;
+    }
+
+    // نجيب المستخدم من السيرفر
+    fetch("/users")
+    .then(res => res.json())
+    .then(users => {
+
+        if(users.length === 0){
+            alert("No users found ❌");
+            return;
+        }
+
+        let user = users[0]; // مؤقت
+
+        fetch("/request", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: user.email,
+                amount: amount,
+                type: "deposit"
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                alert("Request sent ✅");
+                window.location.href = "/pending";
+            } else {
+                alert("Error ❌");
+            }
+        });
+
+    });
 }
 
-// إرسال للسيرفر
-fetch("/request", {
-method: "POST",
-headers: {"Content-Type":"application/json"},
-body: JSON.stringify({
-email: user.email,
-amount: amount,
-type: "recharge"
-})
-})
-.then(res=>res.text())
-.then(msg=>{
 
-// حفظ المبلغ
-localStorage.setItem("lastAmount", amount);
+// ================= LOAD ADDRESS =================
+async function loadAddress(){
 
-// تحويل لصفحة الانتظار
-window.location.href = "/pending";
+    let res = await fetch("/users");
+    let users = await res.json();
 
-});
-}</script>
+    if(users.length === 0){
+        document.getElementById("address").innerText = "No address";
+        return;
+    }
+
+    let user = users[0]; // مؤقت
+
+    let address = user.usdt || "No address";
+
+    // تحديث النص
+    document.getElementById("address").innerText = address;
+
+    // تحديث QR
+    document.getElementById("qr").src =
+        "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + address;
+}
+
+loadAddress();
+
+</script>
 
 </body>
 </html>`);
