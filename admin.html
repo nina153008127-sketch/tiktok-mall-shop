@@ -495,31 +495,9 @@ function sendReply(){
     });
 }
 
-// بيانات وهمية (مؤقتة)
-let walletData = JSON.parse(localStorage.getItem("walletData")) || [
-    {
-        email: "user1@gmail.com",
-        balance: 100,
-        usdt: "TXXXX111",
-        deposits: [
-            {amount: 50, image: "https://via.placeholder.com/100", status: "pending"}
-        ],
-        withdraws: [
-            {amount: 20, status: "pending"}
-        ]
-    },
-    {
-        email: "user2@gmail.com",
-        balance: 200,
-        usdt: "TXXXX222",
-        deposits: [],
-        withdraws: []
-    }
-];
+// بيانات وهمية (مؤقتة) 
 
-function saveWalletData(){
-    localStorage.setItem("walletData", JSON.stringify(walletData));
-}
+let walletData = [];
 
 // عرض المستخدمين
 async function loadWalletUsers(){
@@ -558,7 +536,7 @@ async function openWallet(email){
     walletData = data;
 
     let user = walletData.find(u => u.email === email);
-    currentWalletUser = { email: email };
+    currentWalletUser = user;
 
     if(!user) return;
 
