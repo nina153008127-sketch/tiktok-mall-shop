@@ -170,7 +170,7 @@ cursor:pointer;
 </div>
 
 <script>
-
+const API_URL = window.location.origin;
 // LOGIN
 function login(){
     let username = document.getElementById("username").value;
@@ -196,7 +196,7 @@ function editUser(email){
 
     if(!newEmail && !newPass) return;
 
-    fetch("/edit-user", {
+    fetch(API_URL + "/edit-user", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -229,7 +229,7 @@ function showPage(page){
 
 // USERS
 if(page === 'users'){
-fetch("/users")
+fetch(API_URL + "/users")
 .then(res => res.json())
 .then(data => {
 
