@@ -1348,14 +1348,18 @@ font-size:50px;
 
 <!-- CARD -->
 <div class="card">
-<h3>Account balance 👁️</h3>
-<div class="balance" id="balance">0.00</div>
-<div>Available balance</div>
-</div>
 
-<div class="actions">
-<div class="btn" onclick="recharge()">Recharge ➤</div>
-<div class="btn" onclick="withdraw()">Withdrawal ➤</div>
+  <div class="left">
+    <h3>Account balance 👁️</h3>
+    <div class="balance" id="balance">0.00</div>
+    <div>Available balance</div>
+  </div>
+
+  <div class="actions">
+    <div class="btn" onclick="recharge()">Recharge ▶</div>
+    <div class="btn" onclick="withdraw()">Withdrawal ▶</div>
+  </div>
+
 </div>
 
 <div class="empty">📄</div>
