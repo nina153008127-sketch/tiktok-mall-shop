@@ -179,35 +179,34 @@ app.get("/support-page", (req, res) => {
 app.post("/register", (req, res) => {
     const { email, password, code } = req.body;
 
-    // تحقق من البيانات
     if (!email || !password || !code) {
         return res.send("Missing data");
     }
 
-    // تحقق من الكود
     if (code !== "123123") {
         return res.send("Invalid invite code");
     }
 
-    // تحقق إذا المستخدم موجود
     const exists = users.find(u => u.email === email);
     if (exists) {
         return res.send("User already exists");
     }
 
-    // تسجيل المستخدم
-    users.push({ 
-    email, 
-    password, 
-    balance:0,
-    usdt: ""
-});
+    let newUser = {
+        email: email,
+        password: password,
+        balance: 0,
+        usdt: ""
+    };
 
-saveUsers();
+    users.push(newUser);
 
-    console.log(users); // 👈 مهم جدًا
+    saveUsers(); // 🔥 مهم جداً
 
-    res.send("User registered successfully");
+    console.log("REGISTERED:", newUser);
+    console.log("ALL USERS:", users);
+
+    res.send("Registered successfully");
 });
 app.get("/users", (req, res) => {
     res.json(users);
