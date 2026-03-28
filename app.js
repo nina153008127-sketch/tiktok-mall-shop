@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 
@@ -20,6 +21,10 @@ app.get("/", (req, res) => {
 });
 
 let users = [];
+
+if (fs.existsSync("users.json")) {
+    users = JSON.parse(fs.readFileSync("users.json"));
+}
 let requests = []; // 👈 هذا هو الحل
 // ================= CHAT SYSTEM =================
 let messages = []; // كل الرسائل
@@ -178,6 +183,8 @@ app.post("/register", (req, res) => {
     balance:0,   // يبدأ بصفر
     usdt: ""      // فاضي
 });
+
+       fs.writeFileSync("users.json", JSON.stringify(users, null, 2));
 
     console.log(users); // 👈 مهم جدًا
 
