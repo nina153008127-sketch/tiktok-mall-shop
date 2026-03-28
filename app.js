@@ -1607,18 +1607,24 @@ fileInput.addEventListener("change", function () {
 
 // NETWORK SWITCH
 function setNet(btn, net){
-    selectedNet = net;
+selectedNet = net;
 
-    document.querySelectorAll(".network button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+document.querySelectorAll(".network button").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
 
-    // ✅ لا نغير العنوان هنا - العنوان ثابت من السيرفر
+// مستقبلاً نغير العنوان من السيرفر
+if(net === "TRC20"){
+document.getElementById("address").innerText = "TBC76ppdDG8aiX4ECAhEmn7TASPm2iAWS";
+}else{
+document.getElementById("address").innerText = "ERC20-ADDRESS-EXAMPLE";
+}
 }
 
 // UPLOAD (مبدئي)
 function uploadImage(){
-    alert("Upload system will be added later");
+alert("Upload system will be added later");
 }
+
 // ================= CONFIRM =================
 function confirmRecharge(){
     let amount = document.getElementById("amount").value;
