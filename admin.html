@@ -603,12 +603,28 @@ function updateUSDT(){
 
     if(!currentWalletUser) return;
 
-    currentWalletUser.usdt = newUSDT;
-       saveWalletData();
+    fetch("/update-usdt", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: currentWalletUser.email,
+            usdt: newUSDT
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            alert("USDT updated ✅");
 
-    alert("USDT Address updated ✅");
+            // إعادة تحميل البيانات
+            openWallet(currentWalletUser.email);
+        } else {
+            alert("Error ❌");
+        }
+    });
 }
-
 // عرض الإيداعات
 function loadDeposits(){
     let container = document.getElementById("depositList");
