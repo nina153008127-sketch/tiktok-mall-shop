@@ -558,7 +558,7 @@ async function openWallet(email){
     walletData = data;
 
     let user = walletData.find(u => u.email === email);
-    currentWalletUser = user;
+    currentWalletUser = { email: email };
 
     if(!user) return;
 
