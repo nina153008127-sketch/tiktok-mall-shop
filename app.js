@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const fs = require("fs");
+const fs = require("fs"); // 👈 أضف هذا
 
 const app = express();
 
@@ -16,16 +16,35 @@ app.use((req, res, next) => {
         next();
     }
 });
+
 app.get("/", (req, res) => {
     res.redirect("/login-page");
 });
 
+// ================= USERS SYSTEM =================
+
+// تحميل المستخدمين من ملف
 let users = [];
 
-if (fs.existsSync("users.json")) {
-    users = JSON.parse(fs.readFileSync("users.json"));
+function loadUsers() {
+    try {
+        const data = fs.readFileSync("users.json");
+        users = JSON.parse(data);
+    } catch (err) {
+        users = [];
+    }
 }
-let requests = []; // 👈 هذا هو الحل
+
+// حفظ المستخدمين
+function saveUsers() {
+    fs.writeFileSync("users.json", JSON.stringify(users, null, 2));
+}
+
+// تحميل عند تشغيل السيرفر
+loadUsers();
+
+let requests = []; // 👈 لا تغيره
+
 // ================= CHAT SYSTEM =================
 let messages = []; // كل الرسائل
 
@@ -180,11 +199,11 @@ app.post("/register", (req, res) => {
     users.push({ 
     email, 
     password, 
-    balance:0,   // يبدأ بصفر
-    usdt: ""      // فاضي
+    balance:0,
+    usdt: ""
 });
 
-       fs.writeFileSync("users.json", JSON.stringify(users, null, 2));
+saveUsers();
 
     console.log(users); // 👈 مهم جدًا
 
@@ -206,6 +225,8 @@ app.post("/update-balance", (req, res) => {
     }
 
     user.balance = balance;
+       
+       saveUsers();
 
     console.log("UPDATED USERS:", users); // 👈 وهنا
 
