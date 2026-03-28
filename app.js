@@ -624,9 +624,8 @@ password:password.value
 .then(res=>res.json())
 .then(data=>{
 if(data.email){
- localStorage.setItem("userEmail", email.value);
 localStorage.setItem("user", JSON.stringify(data));
-window.location.href="/wallet";
+window.location.href="/dashboard";
 }else{
 alert("Login failed");
 }
