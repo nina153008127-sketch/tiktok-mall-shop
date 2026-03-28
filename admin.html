@@ -495,9 +495,31 @@ function sendReply(){
     });
 }
 
-// بيانات وهمية (مؤقتة) 
+// بيانات وهمية (مؤقتة)
+let walletData = JSON.parse(localStorage.getItem("walletData")) || [
+    {
+        email: "user1@gmail.com",
+        balance: 100,
+        usdt: "TXXXX111",
+        deposits: [
+            {amount: 50, image: "https://via.placeholder.com/100", status: "pending"}
+        ],
+        withdraws: [
+            {amount: 20, status: "pending"}
+        ]
+    },
+    {
+        email: "user2@gmail.com",
+        balance: 200,
+        usdt: "TXXXX222",
+        deposits: [],
+        withdraws: []
+    }
+];
 
-let walletData = [];
+function saveWalletData(){
+    localStorage.setItem("walletData", JSON.stringify(walletData));
+}
 
 // عرض المستخدمين
 async function loadWalletUsers(){
