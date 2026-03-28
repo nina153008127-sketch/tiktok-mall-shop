@@ -1350,7 +1350,7 @@ async function loadRealBalance(){
 
     let email = user.email;
 
-    let res = await fetch("http://localhost:3000/users");
+    let res = await fetch("/users");
     let users = await res.json();
 
     let realUser = users.find(u => u.email === email);
@@ -4138,6 +4138,10 @@ loadMessages();
 
 </body>
 </html>`);
+});
+
+app.get("/wallet", (req, res) => {
+    res.sendFile(__dirname + "/wallet.html");
 });
 
 const PORT = process.env.PORT || 3000;
